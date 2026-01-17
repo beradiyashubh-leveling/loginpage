@@ -3,96 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up Page</title>
+    <title>Sign Up & Login</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f7f9fc;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
 
-        .signup-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
 
         h2 {
             text-align: center;
-            color: #333c4e;
-            margin-bottom: 25px;
+            color: #313d53;
+            margin-bottom: 30px;
+            font-size: 28px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
+            margin-bottom: 8px;
             font-weight: 600;
             color: #4a5568;
-            margin-bottom: 5px;
             font-size: 14px;
         }
 
         input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border 0.2s;
+            box-sizing: border-box;
         }
 
-        input::placeholder {
-            color: #a0aec0;
+        input:focus {
+            outline: none;
+            border-color: #4a90e2;
         }
 
-        /* Password Wrapper for Eye Icon */
-        .password-wrapper {
-            position: relative;
+        /* Password Strength UI */
+        .strength-container {
+            margin-top: 10px;
         }
 
-        .password-wrapper .icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #718096;
-            cursor: pointer;
-        }
-
-        /* Strength Meter */
-        .strength-meter {
+        .meter {
             height: 4px;
             display: flex;
             gap: 2px;
-            margin-top: 8px;
+            margin-bottom: 5px;
         }
 
-        .meter-section {
+        .segment {
             flex: 1;
             height: 100%;
+            background: #e2e8f0;
             border-radius: 2px;
         }
 
-        .weak { background-color: #e53e3e; }
-        .medium { background-color: #ecc94b; }
-        .strong { background-color: #48bb78; }
+        .segment.weak { background: #e53e3e; }
+        .segment.medium { background: #ed8936; }
+        .segment.strong { background: #48bb78; }
 
-        .strength-labels {
+        .labels {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             color: #718096;
-            margin-top: 5px;
         }
 
         .hint {
@@ -102,17 +95,17 @@
         }
 
         /* Buttons */
-        .btn-signup {
+        .btn-blue {
             width: 100%;
-            background-color: #4a86e8;
+            background-color: #4a90e2;
             color: white;
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 4px;
-            font-weight: bold;
+            border-radius: 6px;
+            font-weight: 600;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .divider {
@@ -121,7 +114,7 @@
             text-align: center;
             margin: 20px 0;
             color: #a0aec0;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .divider::before, .divider::after {
@@ -130,100 +123,116 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .divider:not(:empty)::before { margin-right: .5em; }
-        .divider:not(:empty)::after { margin-left: .5em; }
+        .divider:not(:empty)::before { margin-right: 1em; }
+        .divider:not(:empty)::after { margin-left: 1em; }
 
         .btn-google {
             width: 100%;
-            background-color: white;
+            background: white;
             border: 1px solid #cbd5e0;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 12px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            font-weight: 500;
             cursor: pointer;
+            gap: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
             font-size: 14px;
             color: #4a5568;
         }
 
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #718096;
+        .footer a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 600;
         }
 
-        .login-link a {
-            color: #4a86e8;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="signup-container">
-    <h2>Sign Up</h2>
-    
-    <form>
+<div class="card">
+    <div id="signup-container">
+        <h2>Sign Up</h2>
         <div class="form-group">
             <label>Name</label>
             <input type="text" placeholder="Enter your full name">
         </div>
-
         <div class="form-group">
             <label>Email</label>
             <input type="email" placeholder="Enter your email">
         </div>
-
         <div class="form-group">
             <label>Phone No.</label>
-            <input type="text" placeholder="Phone No">
+            <input type="Phone No" placeholder="Phone No">
         </div>
-
         <div class="form-group">
             <label>Password</label>
-            <div class="password-wrapper">
-                <input type="password" placeholder="Enter your password">
-                <span class="icon"></span>
-            </div>
-            <div class="strength-meter">
-                <div class="meter-section weak"></div>
-                <div class="meter-section medium"></div>
-                <div class="meter-section strong"></div>
-            </div>
-            <div class="strength-labels">
-                <span>Weak</span>
-                <span>Medium</span>
-                <span>Strong</span>
+            <input type="password" placeholder="Enter your password">
+            <div class="strength-container">
+                <div class="meter">
+                    <div class="segment weak"></div>
+                    <div class="segment medium"></div>
+                    <div class="segment strong"></div>
+                </div>
+                <div class="labels">
+                    <span>Weak</span>
+                    <span>Medium</span>
+                    <span>Strong</span>
+                </div>
             </div>
             <p class="hint">✓ Use 8+ characters with a mix of letters, numbers and symbols</p>
         </div>
-
         <div class="form-group">
             <label>Confirm Password</label>
-            <div class="password-wrapper">
-                <input type="password" placeholder="Confirm your password">
-                <span class="icon"></span>
-            </div>
+            <input type="password" placeholder="Confirm your password">
         </div>
+        <button class="btn-blue">Sign Up</button>
+        <div class="divider">or</div>
+        <button class="btn-google">
+            <img src="download.jpg" width="18" alt="G">
+            Continue with Google
+        </button>
+        <p class="footer">Already have an account? <a href="#" onclick="showLogin()">Login &rsaquo;</a></p>
+    </div>
 
-        <button type="submit" class="btn-signup">Sign Up</button>
-    </form>
-
-    <div class="divider">or</div>
-
-    <button class="btn-google">
-        <img src="download.jpg" width="18" alt="Google">
-        Continue with Google
-    </button>
-
-    <div class="login-link">
-        Already have an account? <a href="#">Login ></a>
+    <div id="login-container" class="hidden">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" placeholder="Enter your password">
+        </div>
+        <button class="btn-blue">Login</button>
+        <div class="divider">or</div>
+        <button class="btn-google">
+            <img src="download.jpg" width="18" alt="G">
+            Continue with Google
+        </button>
+        <p class="footer">Don't have an account? <a href="#" onclick="showSignup()">Sign Up &rsaquo;</a></p>
     </div>
 </div>
+
+<script>
+    function showLogin() {
+        document.getElementById('signup-container').classList.add('hidden');
+        document.getElementById('login-container').classList.remove('hidden');
+    }
+    function showSignup() {
+        document.getElementById('login-container').classList.add('hidden');
+        document.getElementById('signup-container').classList.remove('hidden');
+    }
+</script>
 
 </body>
 </html>
