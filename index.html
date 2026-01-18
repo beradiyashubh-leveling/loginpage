@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f7f9fc;
+            background: linear-gradient(135deg,#e0e7ff 0%,#f3e8ff 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,15 +18,18 @@
         .card {
             background: white;
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            outline: 3px solid rgba(74,144,226,0.3);
+            outline-offset: 4px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin: 20px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
         }
 
         h2 {
             text-align: center;
-            color: #313d53;
+            color: #42948f;
             margin-bottom: 30px;
             font-size: 28px;
         }
@@ -58,7 +61,6 @@
             border-color: #4a90e2;
         }
 
-        /* Password Strength UI */
         .strength-container {
             margin-top: 10px;
         }
@@ -94,10 +96,9 @@
             margin-top: 8px;
         }
 
-        /* Buttons */
         .btn-blue {
             width: 100%;
-            background-color: #4a90e2;
+            background: linear-gradient(135deg,#42948f 0%,#4a90e2 100%);
             color: white;
             padding: 14px;
             border: none;
@@ -148,7 +149,7 @@
         }
 
         .footer a {
-            color: #4a90e2;
+            color:#42948f;
             text-decoration: none;
             font-weight: 600;
         }
@@ -163,19 +164,19 @@
         <h2>Sign Up</h2>
         <div class="form-group">
             <label>Name</label>
-            <input type="text" placeholder="Enter your full name">
+            <input type="text" id="signup-name" placeholder="Enter your full name">
         </div>
         <div class="form-group">
             <label>Email</label>
-            <input type="email" placeholder="Enter your email">
+            <input type="email" id="signup-email" placeholder="Enter your email">
         </div>
         <div class="form-group">
             <label>Phone No.</label>
-            <input type="Phone No" placeholder="Phone No">
+            <input type="text" id="signup-phone" placeholder="Phone No">
         </div>
         <div class="form-group">
             <label>Password</label>
-            <input type="password" placeholder="Enter your password">
+            <input type="password" id="signup-password" placeholder="Enter your password">
             <div class="strength-container">
                 <div class="meter">
                     <div class="segment weak"></div>
@@ -188,16 +189,15 @@
                     <span>Strong</span>
                 </div>
             </div>
-            <p class="hint">✓ Use 8+ characters with a mix of letters, numbers and symbols</p>
+            <p class="hint">✓ Use 8+ characters</p>
         </div>
         <div class="form-group">
             <label>Confirm Password</label>
-            <input type="password" placeholder="Confirm your password">
+            <input type="password" id="signup-confirm" placeholder="Confirm your password">
         </div>
-        <button class="btn-blue">Sign Up</button>
+        <button class="btn-blue" onclick="handleSignUp()">Sign Up</button>
         <div class="divider">or</div>
-        <button class="btn-google">
-            <img src="download.jpg" width="18" alt="G">
+        <button class="btn-google" onclick="handleGoogleLogin()">
             Continue with Google
         </button>
         <p class="footer">Already have an account? <a href="#" onclick="showLogin()">Login &rsaquo;</a></p>
@@ -207,31 +207,92 @@
         <h2>Login</h2>
         <div class="form-group">
             <label>Email</label>
-            <input type="email" placeholder="Enter your email">
+            <input type="email" id="login-email" placeholder="Enter your email">
         </div>
         <div class="form-group">
             <label>Password</label>
-            <input type="password" placeholder="Enter your password">
+            <input type="password" id="login-password" placeholder="Enter your password">
         </div>
-        <button class="btn-blue">Login</button>
+        <button class="btn-blue" onclick="handleLogin()">Login</button>
         <div class="divider">or</div>
-        <button class="btn-google">
-            <img src="download.jpg" width="18" alt="G">
+        <button class="btn-google" onclick="handleGoogleLogin()">
             Continue with Google
         </button>
         <p class="footer">Don't have an account? <a href="#" onclick="showSignup()">Sign Up &rsaquo;</a></p>
     </div>
 </div>
 
-<script>
-    function showLogin() {
+<script type="module">
+    // Import Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // --- CONFIGURATION ---
+    // You must replace these values with your project's info from the Firebase Console
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Toggle UI Functions
+    window.showLogin = () => {
         document.getElementById('signup-container').classList.add('hidden');
         document.getElementById('login-container').classList.remove('hidden');
-    }
-    function showSignup() {
+    };
+    window.showSignup = () => {
         document.getElementById('login-container').classList.add('hidden');
         document.getElementById('signup-container').classList.remove('hidden');
-    }
+    };
+
+    // Registration Logic
+    window.handleSignUp = async () => {
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const confirm = document.getElementById('signup-confirm').value;
+
+        if (password !== confirm) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            alert("Registration successful!");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    };
+
+    // Login Logic
+    window.handleLogin = async () => {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            alert("Login successful!");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    };
+
+    // Google Login Logic
+    window.handleGoogleLogin = async () => {
+        try {
+            await signInWithPopup(auth, provider);
+            alert("Google Sign-in successful!");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    };
 </script>
 
 </body>
